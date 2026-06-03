@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/aidev
+    username: aidev
+    password: aidev
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+groq:
+  api-key: ${GROQ_API_KEY}
