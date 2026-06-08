@@ -10,3 +10,8 @@ spring:
 
 groq:
   api-key: ${GROQ_API_KEY}
+
+logging:
+  level:
+    com.max.ai_dev_companion: DEBUG
+    root: INFO
