@@ -4,6 +4,9 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * DTO representing a conversation with its message history.
+ */
 public record ConversationResponse(
         UUID id,
         String title,

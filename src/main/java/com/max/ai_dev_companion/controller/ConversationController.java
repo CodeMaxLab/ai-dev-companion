@@ -21,6 +21,11 @@ import com.max.ai_dev_companion.service.ConversationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * REST controller for conversation management.
+ *
+ * <p>Handles conversation creation, retrieval, listing and message posting.
+ */
 @RestController
 @RequestMapping("/conversations")
 @RequiredArgsConstructor
@@ -33,6 +38,11 @@ public class ConversationController {
         return conversationService.createConversation(request.title());
     }
 
+    /**
+     * Returns the list of existing conversations.
+     *
+     * @return a list of conversation summary DTOs
+     */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ConversationSummaryResponse> listConversations() {
         return conversationService.listConversations();
@@ -43,6 +53,12 @@ public class ConversationController {
         return conversationService.getConversation(conversationId);
     }
 
+    /**
+     * Returns the messages of a conversation.
+     *
+     * @param conversationId the conversation identifier
+     * @return the messages of the conversation
+     */
     @GetMapping(value = "/{conversationId}/messages", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<MessageResponse> getConversationMessages(@PathVariable UUID conversationId) {
         return conversationService.getConversationMessages(conversationId);

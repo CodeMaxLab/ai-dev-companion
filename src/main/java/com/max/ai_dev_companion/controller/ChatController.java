@@ -13,12 +13,23 @@ import com.max.ai_dev_companion.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 
+/**
+ * REST controller for chat operations.
+ *
+ * <p>Exposes endpoints for synchronous chat and streaming chat responses.
+ */
 @RestController
 @RequiredArgsConstructor
 public class ChatController {
 
     private final ChatService chatService;
 
+    /**
+     * Sends a single chat message to the LLM and returns the full response.
+     *
+     * @param request the incoming chat request containing the user message
+     * @return a response DTO with the AI answer
+     */
     @PostMapping(
             value = "/chat",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -31,6 +42,12 @@ public class ChatController {
         );
     }
 
+    /**
+     * Opens a server-sent event stream for partial LLM outputs.
+     *
+     * @param request the incoming chat request containing the user message
+     * @return a flux of SSE events for each partial token emitted by the model
+     */
     @PostMapping(
             value = "/chat/stream",
             produces = "text/event-stream;charset=UTF-8"

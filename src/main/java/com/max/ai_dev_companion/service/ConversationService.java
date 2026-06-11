@@ -21,9 +21,13 @@ import com.max.ai_dev_companion.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
+/**
+ * Service managing the lifecycle of conversations.
+ *
+ * <p>This service is responsible for creating conversations, adding user
+ * messages, calling the language model to obtain an AI response, and converting
+ * entities into DTOs exposed by the controllers.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -33,6 +37,13 @@ public class ConversationService {
     private final MessageRepository messageRepository;
     private final ChatService chatService;
 
+    /**
+     * Creates a new conversation with a safe title.
+     *
+     * @param title the title provided by the client; an empty or null value is replaced
+     *              with the default title {@code "New conversation"}
+     * @return the DTO representing the created conversation
+     */
     public ConversationResponse createConversation(String title) {
         String safeTitle = title == null || title.isBlank() ? "New conversation" : title.trim();
         Conversation conversation = new Conversation(safeTitle);
@@ -40,6 +51,15 @@ public class ConversationService {
         return toConversationResponse(saved);
     }
 
+    /**
+     * Adds a user message to an existing conversation, sends the history to the
+     * language model, and stores the AI response in the conversation.
+     *
+     * @param conversationId the identifier of the targeted conversation
+     * @param content        the content of the user message
+     * @return the DTO of the generated AI message
+     * @throws ResponseStatusException if the conversation does not exist
+     */
     @Transactional
     public MessageResponse sendMessage(UUID conversationId, String content) {
         Conversation conversation = conversationRepository.findById(conversationId)
@@ -62,6 +82,13 @@ public class ConversationService {
         return toMessageResponse(aiMessage);
     }
 
+    /**
+     * Retrieves a complete conversation with its messages.
+     *
+     * @param conversationId the identifier of the requested conversation
+     * @return the DTO representing the conversation
+     * @throws ResponseStatusException if the conversation does not exist
+     */
     public ConversationResponse getConversation(UUID conversationId) {
         Conversation conversation = conversationRepository.findById(conversationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conversation non trouvée"));
@@ -69,10 +96,21 @@ public class ConversationService {
         return toConversationResponse(conversation);
     }
 
+    /**
+     * Returns only the messages of a conversation.
+     *
+     * @param conversationId the identifier of the requested conversation
+     * @return the list of messages as DTOs
+     */
     public List<MessageResponse> getConversationMessages(UUID conversationId) {
         return getConversation(conversationId).messages();
     }
 
+    /**
+     * Lists all existing conversations as summaries.
+     *
+     * @return the list of available conversations
+     */
     public List<ConversationSummaryResponse> listConversations() {
         return conversationRepository.findAll().stream()
                 .map(this::toSummaryResponse)
