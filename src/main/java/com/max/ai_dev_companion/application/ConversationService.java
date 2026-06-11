@@ -31,7 +31,7 @@ public class ConversationService {
     private final ChatService chatService;
 
     public ConversationResponse createConversation(String title) {
-        String safeTitle = title == null || title.isBlank() ? "Nouvelle conversation" : title.trim();
+        String safeTitle = title == null || title.isBlank() ? "New conversation" : title.trim();
         Conversation conversation = new Conversation(safeTitle);
         Conversation saved = conversationRepository.save(conversation);
         return toConversationResponse(saved);
