@@ -1,4 +1,4 @@
-package com.max.ai_dev_companion.api;
+package com.max.ai_dev_companion.controller;
 
 import java.util.List;
 import java.util.UUID;
@@ -11,7 +11,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.max.ai_dev_companion.application.ConversationService;
+import com.max.ai_dev_companion.dto.ConversationResponse;
+import com.max.ai_dev_companion.dto.ConversationSummaryResponse;
+import com.max.ai_dev_companion.dto.CreateConversationRequest;
+import com.max.ai_dev_companion.dto.MessageRequest;
+import com.max.ai_dev_companion.dto.MessageResponse;
+import com.max.ai_dev_companion.service.ConversationService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

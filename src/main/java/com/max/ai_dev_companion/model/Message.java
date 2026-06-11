@@ -1,4 +1,4 @@
-package com.max.ai_dev_companion.domain;
+package com.max.ai_dev_companion.model;
 
 import java.time.Instant;
 import java.util.UUID;

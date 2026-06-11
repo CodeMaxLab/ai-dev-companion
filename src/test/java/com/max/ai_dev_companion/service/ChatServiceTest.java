@@ -1,4 +1,4 @@
-package com.max.ai_dev_companion;
+package com.max.ai_dev_companion.service;
 
 import java.util.List;
 
@@ -13,9 +13,8 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.max.ai_dev_companion.application.ChatService;
-import com.max.ai_dev_companion.domain.Message;
-import com.max.ai_dev_companion.domain.MessageRole;
+import com.max.ai_dev_companion.model.Message;
+import com.max.ai_dev_companion.model.MessageRole;
 
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;

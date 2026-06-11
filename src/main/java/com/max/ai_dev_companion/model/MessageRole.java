@@ -1,4 +1,4 @@
-package com.max.ai_dev_companion.domain;
+package com.max.ai_dev_companion.model;
 
 public enum MessageRole {
     USER,

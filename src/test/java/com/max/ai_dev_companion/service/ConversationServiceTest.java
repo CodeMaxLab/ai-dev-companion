@@ -1,4 +1,4 @@
-package com.max.ai_dev_companion;
+package com.max.ai_dev_companion.service;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,16 +16,15 @@ import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.max.ai_dev_companion.api.ConversationResponse;
-import com.max.ai_dev_companion.api.ConversationSummaryResponse;
-import com.max.ai_dev_companion.api.MessageResponse;
-import com.max.ai_dev_companion.application.ChatService;
-import com.max.ai_dev_companion.application.ConversationService;
-import com.max.ai_dev_companion.domain.Conversation;
-import com.max.ai_dev_companion.domain.Message;
-import com.max.ai_dev_companion.domain.MessageRole;
+import com.max.ai_dev_companion.dto.ConversationResponse;
+import com.max.ai_dev_companion.dto.ConversationSummaryResponse;
+import com.max.ai_dev_companion.dto.MessageResponse;
+import com.max.ai_dev_companion.model.Conversation;
+import com.max.ai_dev_companion.model.Message;
+import com.max.ai_dev_companion.model.MessageRole;
 import com.max.ai_dev_companion.repository.ConversationRepository;
 import com.max.ai_dev_companion.repository.MessageRepository;
+
 
 @ExtendWith(MockitoExtension.class)
 class ConversationServiceTest {

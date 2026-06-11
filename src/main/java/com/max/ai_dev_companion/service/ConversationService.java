@@ -1,4 +1,4 @@
-package com.max.ai_dev_companion.application;
+package com.max.ai_dev_companion.service;
 
 import java.util.List;
 import java.util.UUID;
@@ -9,14 +9,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.max.ai_dev_companion.api.ConversationResponse;
-import com.max.ai_dev_companion.api.ConversationSummaryResponse;
-import com.max.ai_dev_companion.api.MessageResponse;
-import com.max.ai_dev_companion.domain.Conversation;
-import com.max.ai_dev_companion.domain.Message;
-import com.max.ai_dev_companion.domain.MessageRole;
+import com.max.ai_dev_companion.dto.ConversationResponse;
+import com.max.ai_dev_companion.dto.ConversationSummaryResponse;
+import com.max.ai_dev_companion.dto.MessageResponse;
+import com.max.ai_dev_companion.model.Conversation;
+import com.max.ai_dev_companion.model.Message;
+import com.max.ai_dev_companion.model.MessageRole;
 import com.max.ai_dev_companion.repository.ConversationRepository;
 import com.max.ai_dev_companion.repository.MessageRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

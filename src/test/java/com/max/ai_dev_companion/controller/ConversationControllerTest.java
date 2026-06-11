@@ -1,10 +1,15 @@
-package com.max.ai_dev_companion.api;
+package com.max.ai_dev_companion.controller;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-import com.max.ai_dev_companion.application.ConversationService;
+import com.max.ai_dev_companion.dto.ConversationResponse;
+import com.max.ai_dev_companion.dto.ConversationSummaryResponse;
+import com.max.ai_dev_companion.dto.CreateConversationRequest;
+import com.max.ai_dev_companion.dto.MessageRequest;
+import com.max.ai_dev_companion.dto.MessageResponse;
+import com.max.ai_dev_companion.service.ConversationService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;

@@ -1,4 +1,4 @@
-package com.max.ai_dev_companion.api;
+package com.max.ai_dev_companion.controller;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
@@ -6,7 +6,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.max.ai_dev_companion.application.ChatService;
+import com.max.ai_dev_companion.dto.ChatRequest;
+import com.max.ai_dev_companion.dto.ChatResponse;
+import com.max.ai_dev_companion.service.ChatService;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;

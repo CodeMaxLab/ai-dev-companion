@@ -1,4 +1,4 @@
-package com.max.ai_dev_companion.api;
+package com.max.ai_dev_companion.dto;
 
 import java.time.Instant;
 import java.util.List;

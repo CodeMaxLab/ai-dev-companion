@@ -1,11 +1,11 @@
-package com.max.ai_dev_companion.application;
+package com.max.ai_dev_companion.service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.max.ai_dev_companion.domain.Message;
+import com.max.ai_dev_companion.model.Message;
 
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;

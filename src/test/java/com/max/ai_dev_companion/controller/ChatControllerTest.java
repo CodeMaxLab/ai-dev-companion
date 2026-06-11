@@ -1,6 +1,7 @@
-package com.max.ai_dev_companion.api;
+package com.max.ai_dev_companion.controller;
 
-import com.max.ai_dev_companion.application.ChatService;
+import com.max.ai_dev_companion.dto.ChatRequest;
+import com.max.ai_dev_companion.service.ChatService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
