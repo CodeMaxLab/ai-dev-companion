@@ -67,7 +67,7 @@ public class ProjectService {
             Files.walkFileTree(root, new SimpleFileVisitor<>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-                    if (isInterestingFile(file)) {
+                    if (isInterestingFile(file, root)) {
                         files.add(new ProjectFileResponse(
                                 root.relativize(file).toString().replace('\\', '/'),
                                 file.getFileName().toString(),
@@ -85,15 +85,25 @@ public class ProjectService {
         return files;
     }
 
-    private boolean isInterestingFile(Path file) {
+    private boolean isInterestingFile(Path file, Path root) {
+        String relativePath = root.relativize(file).toString().replace('\\', '/');
         String fileName = file.getFileName().toString().toLowerCase();
-        return fileName.endsWith(".md")
+
+        if (relativePath.startsWith("frontend/node_modules") || relativePath.startsWith("tests") || relativePath.startsWith(".github")) {
+            return false;
+        }
+
+        boolean interestingExtension =
+                fileName.endsWith(".md")
                 || fileName.endsWith(".java")
                 || fileName.endsWith(".sql")
                 || fileName.endsWith(".yml")
                 || fileName.endsWith(".yaml")
                 || fileName.endsWith(".txt")
-                || fileName.endsWith(".properties");
+                || fileName.endsWith(".properties")
+                || fileName.endsWith(".py");
+
+        return interestingExtension;
     }
 
     private ProjectResponse toProjectResponse(Project project) {
