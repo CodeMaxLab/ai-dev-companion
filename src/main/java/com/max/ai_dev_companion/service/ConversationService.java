@@ -83,14 +83,14 @@ public class ConversationService {
     }
 
     /**
-     * Retrieves a complete conversation with its messages.
+     * Retrieves a complete conversation.
      *
      * @param conversationId the identifier of the requested conversation
      * @return the DTO representing the conversation
      * @throws ResponseStatusException if the conversation does not exist
      */
     public ConversationResponse getConversation(UUID conversationId) {
-        Conversation conversation = conversationRepository.findWithMessagesById(conversationId)
+        Conversation conversation = conversationRepository.findById(conversationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conversation non trouvée"));
 
         return toConversationResponse(conversation);
@@ -103,8 +103,11 @@ public class ConversationService {
      * @return the list of messages as DTOs
      */
     public List<MessageResponse> getConversationMessages(UUID conversationId) {
-        List<MessageResponse> result = getConversation(conversationId).messages();
-        log.debug("getConversationMessages - conversationId={} - messages count={}", conversationId, result.size());
+        Conversation conversation = conversationRepository.findWithMessagesById(conversationId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conversation non trouvée"));
+        List<MessageResponse> result = conversation.getMessages().stream()
+                .map(this::toMessageResponse)
+                .collect(Collectors.toList());
         return result;
     }
 

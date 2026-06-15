@@ -100,7 +100,7 @@ class ConversationServiceTest {
         Conversation conversation = new Conversation("Test");
         Message message = new Message(MessageRole.USER, "Bonjour");
         conversation.addMessage(message);
-        when(conversationRepository.findById(any(UUID.class))).thenReturn(Optional.of(conversation));
+        when(conversationRepository.findWithMessagesById(any(UUID.class))).thenReturn(Optional.of(conversation));
 
         List<MessageResponse> messages = conversationService.getConversationMessages(UUID.randomUUID());
 
