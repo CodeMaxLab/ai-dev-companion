@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.max.ai_dev_companion.dto.CreateProjectRequest;
+import com.max.ai_dev_companion.dto.IndexedFileCountResponse;
 import com.max.ai_dev_companion.dto.ProjectFileResponse;
 import com.max.ai_dev_companion.dto.ProjectResponse;
 import com.max.ai_dev_companion.service.ProjectService;
@@ -46,5 +47,16 @@ public class ProjectController {
     @GetMapping(value = "/{projectId}/files", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ProjectFileResponse> getProjectFiles(@PathVariable UUID projectId) {
         return projectService.listProjectFiles(projectId);
+    }
+
+    /**
+     * Indexes the project's interesting files in the database.
+     *
+     * @param projectId the project identifier
+     * @return the count of indexed files
+     */
+    @PostMapping(value = "/{projectId}/files", produces = MediaType.APPLICATION_JSON_VALUE)
+    public IndexedFileCountResponse indexProjectFiles(@PathVariable UUID projectId) {
+        return projectService.indexProjectFiles(projectId);
     }
 }

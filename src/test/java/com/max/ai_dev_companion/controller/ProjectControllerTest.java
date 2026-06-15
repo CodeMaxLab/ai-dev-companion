@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.max.ai_dev_companion.dto.CreateProjectRequest;
+import com.max.ai_dev_companion.dto.IndexedFileCountResponse;
 import com.max.ai_dev_companion.dto.ProjectFileResponse;
 import com.max.ai_dev_companion.dto.ProjectResponse;
 import com.max.ai_dev_companion.service.ProjectService;
@@ -63,5 +64,19 @@ class ProjectControllerTest {
                 .expectBody()
                 .jsonPath("$[0].relativePath").isEqualTo("README.md")
                 .jsonPath("$[1].relativePath").isEqualTo("src/Main.java");
+    }
+
+    @Test
+    void indexProjectFiles_shouldReturnIndexedFileCount() {
+        UUID projectId = UUID.randomUUID();
+        when(projectService.indexProjectFiles(eq(projectId)))
+                .thenReturn(new IndexedFileCountResponse(2));
+
+        webTestClient.post()
+                .uri("/projects/{projectId}/files", projectId)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.indexedFiles").isEqualTo(2);
     }
 }
