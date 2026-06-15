@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import icon from './icon.png';
 
 const apiFetch = async (path, options = {}) => {
   console.log(`API request: ${options.method || 'GET'} ${path}`);
@@ -46,7 +47,10 @@ export default function App() {
     try {
       setIsLoading(true);
       const data = await apiFetch(`/conversations/${conversationId}/messages`);
-      setSelectedConversation(data);
+      setSelectedConversation({
+        id: conversationId,
+        messages: data,
+      });
       setPrompt('');
       setError('');
     } catch (err) {
@@ -76,6 +80,11 @@ export default function App() {
 
   const sendMessage = async () => {
     if (!selectedConversation || !prompt.trim()) return;
+    setSelectedConversation((current) => ({
+        ...current,
+        messages: [...(current.messages || []), { content: prompt.trim(), role: 'USER', createdAt: new Date(Date.now()).toLocaleString(), id: `temp-${Date.now()}` }]
+      }));
+
     try {
       setIsLoading(true);
       const message = await apiFetch(`/conversations/${selectedConversation.id}/messages`, {
@@ -100,8 +109,8 @@ export default function App() {
     <div className="app-shell">
       <aside className="sidebar">
         <div className="sidebar-brand">
-          <div className="brand-icon">N</div>
-          <div className="brand-title">Nexus AI</div>
+          <div className="brand-icon"><img src={icon} alt="toto" /></div>
+          <div className="brand-title">AI Companion</div>
         </div>
 
         <div className="sidebar-controls">

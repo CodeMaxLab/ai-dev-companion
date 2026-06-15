@@ -53,8 +53,14 @@ textarea {
   font-weight:700;
   color:white;
 }
+.brand-icon img{
+  max-width:100%;
+  height:auto;
+}
 .brand-title{
-  font-weight:700;
+  font-weight:400;
+  font-size: larger;
+  color: rgb(40, 200, 240);
 }
 
 .sidebar-controls{
@@ -115,13 +121,16 @@ textarea {
 }
 .conv-avatar{
   width:44px;
-  height:44px;
-  border-radius:10px;
-  background:linear-gradient(135deg,#334155,#0ea5e9);
+  height:34px;
+  border-radius:5px;
+  border-width:1px;
+  border-color: rgb(40, 200, 240);
+  border-style: solid;
   display:flex;
   align-items:center;
   justify-content:center;
   font-weight:700;
+  color: rgb(40, 200, 240);
 }
 .conversation-title{font-weight:600}
 .conversation-snippet{font-size:0.85rem;color:#94a3b8}
@@ -173,7 +182,7 @@ textarea {
   flex-direction: column;
   gap: 14px;
   overflow-y: auto;
-  max-height: calc(100vh - 320px);
+  max-height: calc(100vh - 200px);
   padding-right:8px;
 }
 
@@ -193,7 +202,7 @@ textarea {
 .message-row.user .message-content{background:linear-gradient(90deg,#0b1220,#07223a);border-color:rgba(14,165,233,0.06)}
 
 .composer{display:flex;gap:12px;align-items:flex-end}
-.composer textarea{flex:1;border-radius:12px;padding:12px;background:#041023;border:1px solid rgba(255,255,255,0.02);color:inherit}
+.composer textarea{flex:1;border-radius:12px;padding:12px;background:rgb(17,24,32);border:1px solid rgba(255,255,255,0.02);color:inherit}
 .composer-actions{display:flex;gap:8px;align-items:center}
 .composer .attach{background:transparent;border:none;color:#9fb3d8;font-size:18px}
 .composer .send{background:#0ea5e9;border:none;color:#022;padding:10px 14px;border-radius:10px;font-weight:700}
