@@ -90,7 +90,7 @@ public class ConversationService {
      * @throws ResponseStatusException if the conversation does not exist
      */
     public ConversationResponse getConversation(UUID conversationId) {
-        Conversation conversation = conversationRepository.findById(conversationId)
+        Conversation conversation = conversationRepository.findWithMessagesById(conversationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conversation non trouvée"));
 
         return toConversationResponse(conversation);
@@ -103,7 +103,9 @@ public class ConversationService {
      * @return the list of messages as DTOs
      */
     public List<MessageResponse> getConversationMessages(UUID conversationId) {
-        return getConversation(conversationId).messages();
+        List<MessageResponse> result = getConversation(conversationId).messages();
+        log.debug("getConversationMessages - conversationId={} - messages count={}", conversationId, result.size());
+        return result;
     }
 
     /**

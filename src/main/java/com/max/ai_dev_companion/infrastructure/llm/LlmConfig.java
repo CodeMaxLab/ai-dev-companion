@@ -12,7 +12,7 @@ import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
 @Configuration
 public class LlmConfig {
 
-    @Value("${groq.api-key}")
+    @Value("${groq.api-key:}")
     private String apiKey;
 
     @Bean
