@@ -3,6 +3,10 @@ package com.max.ai_dev_companion.model;
 import java.time.Instant;
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+import com.pgvector.PGvector;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,6 +15,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "chunks")
+@TypeDef(defaultForType = PGvector.class, typeClass = org.pgvector.hibernate.VectorType.class)
 public class Chunk {
 
     /**
@@ -43,8 +48,8 @@ public class Chunk {
     @Column(columnDefinition = "TEXT")
     private String metadata;
 
-    @Column(columnDefinition = "TEXT")
-    private String embedding;
+    @Column(name = "embedding", columnDefinition = "vector(1536)")
+    private PGvector embedding;
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt = Instant.now();
@@ -53,7 +58,7 @@ public class Chunk {
     }
 
     public Chunk(UUID sourceId, String sourcePath, String text, int startOffset, int endOffset, String metadata,
-            String embedding) {
+            PGvector embedding) {
         this.sourceId = sourceId;
         this.sourcePath = sourcePath;
         this.text = text;
@@ -96,11 +101,11 @@ public class Chunk {
         this.metadata = metadata;
     }
 
-    public String getEmbedding() {
+    public PGvector getEmbedding() {
         return embedding;
     }
 
-    public void setEmbedding(String embedding) {
+    public void setEmbedding(PGvector embedding) {
         this.embedding = embedding;
     }
 

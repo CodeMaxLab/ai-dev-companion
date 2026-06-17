@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.max.ai_dev_companion.dto.IndexedFileCountResponse;
 import com.max.ai_dev_companion.dto.ProjectIndexResponse;
-import com.max.ai_dev_companion.service.ChunkIndexingService;
 
 import lombok.RequiredArgsConstructor;
 
