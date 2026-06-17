@@ -30,6 +30,9 @@ class ProjectControllerTest {
     @MockBean
     private ProjectService projectService;
 
+    @MockBean
+    private com.max.ai_dev_companion.service.ProjectIndexService projectIndexService;
+
     @Test
     void createProject_shouldReturnProjectResponse() {
         UUID projectId = UUID.randomUUID();

@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.max.ai_dev_companion.dto.CreateProjectRequest;
 import com.max.ai_dev_companion.dto.IndexedFileCountResponse;
 import com.max.ai_dev_companion.dto.ProjectFileResponse;
+import com.max.ai_dev_companion.dto.ProjectIndexResponse;
 import com.max.ai_dev_companion.dto.ProjectResponse;
+import com.max.ai_dev_companion.service.ProjectIndexService;
 import com.max.ai_dev_companion.service.ProjectService;
 
 import jakarta.validation.Valid;
@@ -26,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class ProjectController {
 
     private final ProjectService projectService;
+    private final ProjectIndexService projectIndexService;
 
     /**
      * Creates a new project.
@@ -58,5 +61,10 @@ public class ProjectController {
     @PostMapping(value = "/{projectId}/files", produces = MediaType.APPLICATION_JSON_VALUE)
     public IndexedFileCountResponse indexProjectFiles(@PathVariable UUID projectId) {
         return projectService.indexProjectFiles(projectId);
+    }
+
+    @PostMapping(value = "/{projectId}/index", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ProjectIndexResponse indexProject(@PathVariable UUID projectId) {
+        return projectIndexService.indexProject(projectId);
     }
 }

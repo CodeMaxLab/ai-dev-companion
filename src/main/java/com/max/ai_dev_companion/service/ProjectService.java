@@ -138,6 +138,7 @@ public class ProjectService {
         return new IndexedFileCountResponse(codeFiles.size());
     }
 
+
     private boolean isInterestingFile(Path file, Path root) {
         String relativePath = root.relativize(file).toString().replace('\\', '/');
         String fileName = file.getFileName().toString().toLowerCase();
