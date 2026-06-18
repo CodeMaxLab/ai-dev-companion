@@ -7,4 +7,4 @@ services:
       POSTGRES_USER: aidev
       POSTGRES_PASSWORD: aidev
     ports:
-      - "5432:5432"
+      - "${DB_HOST_PORT:-15432}:5432"

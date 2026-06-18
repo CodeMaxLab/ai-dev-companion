@@ -11,8 +11,6 @@ import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.pgvector.PGvector;
-
 import com.max.ai_dev_companion.model.Chunk;
 import com.max.ai_dev_companion.model.CodeFile;
 import com.max.ai_dev_companion.repository.CodeFileRepository;
@@ -36,8 +34,8 @@ class ChunkIndexingServiceTest {
         CodeFile f2 = new CodeFile("b.txt", "alpha beta gamma", null);
 
         when(codeFileRepository.findByProjectId(projectId)).thenReturn(List.of(f1, f2));
-        when(chunkingService.chunkAndSave(f1)).thenReturn(List.of(new Chunk(null, "a.txt", "t", 0, 1, null, PGvector.of(0.1f))));
-        when(chunkingService.chunkAndSave(f2)).thenReturn(List.of(new Chunk(null, "b.txt", "t1", 0, 1, null, PGvector.of(0.2f)), new Chunk(null, "b.txt", "t2", 1, 2, null, Vector.of(0.3f))));
+        when(chunkingService.chunkAndSave(f1)).thenReturn(List.of(new Chunk(null, "a.txt", "t", 0, 1, null, null)));
+        when(chunkingService.chunkAndSave(f2)).thenReturn(List.of(new Chunk(null, "b.txt", "t1", 0, 1, null, null), new Chunk(null, "b.txt", "t2", 1, 2, null, null)));
 
         int total = service.indexChunksForProject(projectId);
 

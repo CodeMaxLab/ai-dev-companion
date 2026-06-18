@@ -15,7 +15,6 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "chunks")
-@TypeDef(defaultForType = PGvector.class, typeClass = org.pgvector.hibernate.VectorType.class)
 public class Chunk {
 
     /**
@@ -48,6 +47,7 @@ public class Chunk {
     @Column(columnDefinition = "TEXT")
     private String metadata;
 
+    @JdbcTypeCode(SqlTypes.VECTOR)
     @Column(name = "embedding", columnDefinition = "vector(1536)")
     private PGvector embedding;
 
