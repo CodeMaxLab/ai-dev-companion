@@ -9,11 +9,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.max.ai_dev_companion.model.Chunk;
-import com.pgvector.PGvector;
 
 @Repository
 public interface ChunkRepository extends JpaRepository<Chunk, UUID> {
 
-    @Query(value = "SELECT * FROM chunks ORDER BY embedding <-> :vector LIMIT :k", nativeQuery = true)
-    List<Chunk> findNearestByEmbedding(@Param("vector") PGvector vector, @Param("k") int k);
+    @Query(value = "SELECT * FROM chunks WHERE embedding IS NOT NULL ORDER BY embedding <-> CAST(:vector AS vector) LIMIT :k", nativeQuery = true)
+    List<Chunk> findNearestByEmbedding(@Param("vector") String vector, @Param("k") int k);
 }

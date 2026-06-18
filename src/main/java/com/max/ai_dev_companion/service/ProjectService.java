@@ -104,8 +104,22 @@ public class ProjectService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Projet non trouvé"));
 
         Path root = Path.of(project.getRootPath());
-        if (!Files.exists(root) || !Files.isDirectory(root)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Le chemin du projet n'est pas un répertoire valide");
+        log.info("Tentative d'indexation du projet {} - Chemin: {}", projectId, root);
+        
+        try {
+            if (!Files.exists(root)) {
+                log.error("Le chemin n'existe pas: {}", root);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Le chemin du projet n'existe pas: " + root);
+            }
+            if (!Files.isDirectory(root)) {
+                log.error("Le chemin n'est pas un répertoire: {}", root);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Le chemin du projet n'est pas un répertoire: " + root);
+            }
+        } catch (ResponseStatusException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            log.error("Erreur lors de la vérification du chemin {}: {}", root, ex.getMessage(), ex);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Erreur lors de la vérification du chemin: " + ex.getMessage());
         }
 
         List<CodeFile> codeFiles = new ArrayList<>();
@@ -126,8 +140,8 @@ public class ProjectService {
                 }
             });
         } catch (IOException e) {
-            log.error("Erreur lors de l'analyse des fichiers du projet {}", projectId, e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Impossible de lister les fichiers du projet");
+            log.error("Erreur lors de l'analyse des fichiers du projet {} - Chemin: {} - Cause: {}", projectId, root, e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Impossible de lister les fichiers du projet: " + e.getMessage());
         }
 
         codeFileRepository.deleteByProjectId(projectId);
@@ -143,7 +157,7 @@ public class ProjectService {
         String relativePath = root.relativize(file).toString().replace('\\', '/');
         String fileName = file.getFileName().toString().toLowerCase();
 
-        if (relativePath.startsWith("frontend/node_modules") || relativePath.startsWith("tests") || relativePath.startsWith(".github")) {
+        if (relativePath.contains("node_modules") || relativePath.startsWith("tests") || relativePath.startsWith(".github")) {
             return false;
         }
 

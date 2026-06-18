@@ -3,10 +3,6 @@ package com.max.ai_dev_companion.model;
 import java.time.Instant;
 import java.util.UUID;
 
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-import com.pgvector.PGvector;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -47,9 +43,9 @@ public class Chunk {
     @Column(columnDefinition = "TEXT")
     private String metadata;
 
-    @JdbcTypeCode(SqlTypes.VECTOR)
-    @Column(name = "embedding", columnDefinition = "vector(1536)")
-    private PGvector embedding;
+    // Embeddings are populated later through explicit SQL, not by JPA entity inserts.
+    @Column(name = "embedding", columnDefinition = "vector(1536)", insertable = false, updatable = false)
+    private String embedding;
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt = Instant.now();
@@ -57,8 +53,8 @@ public class Chunk {
     protected Chunk() {
     }
 
-    public Chunk(UUID sourceId, String sourcePath, String text, int startOffset, int endOffset, String metadata,
-            PGvector embedding) {
+        public Chunk(UUID sourceId, String sourcePath, String text, int startOffset, int endOffset, String metadata,
+            String embedding) {
         this.sourceId = sourceId;
         this.sourcePath = sourcePath;
         this.text = text;
@@ -101,11 +97,11 @@ public class Chunk {
         this.metadata = metadata;
     }
 
-    public PGvector getEmbedding() {
+    public String getEmbedding() {
         return embedding;
     }
 
-    public void setEmbedding(PGvector embedding) {
+    public void setEmbedding(String embedding) {
         this.embedding = embedding;
     }
 
