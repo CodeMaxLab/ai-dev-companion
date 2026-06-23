@@ -5,6 +5,7 @@ import java.util.UUID;
 public record ProjectIndexResponse(
         UUID projectId,
         int filesIndexed,
-        int chunksGenerated
+        int chunksGenerated,
+        int embeddingsGenerated
 ) {
 }
