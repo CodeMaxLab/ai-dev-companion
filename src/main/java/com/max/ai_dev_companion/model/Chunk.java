@@ -43,8 +43,7 @@ public class Chunk {
     @Column(columnDefinition = "TEXT")
     private String metadata;
 
-    // Embeddings are populated later through explicit SQL, not by JPA entity inserts.
-    @Column(name = "embedding", columnDefinition = "vector(1536)", insertable = false, updatable = false)
+    @Column(name = "embedding", columnDefinition = "vector(384)", insertable = false, updatable = false)
     private String embedding;
 
     @Column(name = "created_at", nullable = false)
@@ -53,15 +52,13 @@ public class Chunk {
     protected Chunk() {
     }
 
-        public Chunk(UUID sourceId, String sourcePath, String text, int startOffset, int endOffset, String metadata,
-            String embedding) {
+    public Chunk(UUID sourceId, String sourcePath, String text, int startOffset, int endOffset, String metadata) {
         this.sourceId = sourceId;
         this.sourcePath = sourcePath;
         this.text = text;
         this.startOffset = startOffset;
         this.endOffset = endOffset;
         this.metadata = metadata;
-        this.embedding = embedding;
         this.createdAt = Instant.now();
     }
 

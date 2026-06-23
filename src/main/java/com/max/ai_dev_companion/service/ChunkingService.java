@@ -60,7 +60,7 @@ public class ChunkingService {
 
             String chunkText = content.substring(start, split).trim();
             if (!chunkText.isEmpty()) {
-                Chunk chunk = new Chunk(file.getId(), file.getPath(), chunkText, start, split, null, null);
+                Chunk chunk = new Chunk(file.getId(), file.getPath(), chunkText, start, split, null);
                 chunks.add(chunk);
             }
 
