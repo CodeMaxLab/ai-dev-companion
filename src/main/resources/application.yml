@@ -21,6 +21,11 @@ groq:
 embedding:
   base-url: ${EMBEDDING_BASE_URL:http://localhost:11434}
   model: ${EMBEDDING_MODEL:all-minilm}
+  max-input-chars: ${EMBEDDING_MAX_INPUT_CHARS:1000}
+
+chunking:
+  max-chars: ${CHUNKING_MAX_CHARS:1000}
+  overlap: ${CHUNKING_OVERLAP:200}
 
 logging:
   level:

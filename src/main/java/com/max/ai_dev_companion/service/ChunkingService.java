@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.max.ai_dev_companion.model.Chunk;
@@ -25,8 +26,14 @@ public class ChunkingService {
     private ChunkRepository chunkRepository;
 
     // Basic character-based chunking with overlap. Tunable parameters.
-    private static final int DEFAULT_MAX_CHARS = 2000;
-    private static final int DEFAULT_OVERLAP = 400;
+    private static final int DEFAULT_MAX_CHARS = 1000;
+    private static final int DEFAULT_OVERLAP = 200;
+
+    @Value("${chunking.max-chars:" + DEFAULT_MAX_CHARS + "}")
+    private int configuredMaxChars;
+
+    @Value("${chunking.overlap:" + DEFAULT_OVERLAP + "}")
+    private int configuredOverlap;
 
     public List<Chunk> chunkAndSave(CodeFile file) {
         if (file == null || file.getContent() == null) {
@@ -34,8 +41,9 @@ public class ChunkingService {
         }
 
         String content = file.getContent();
-        int maxChars = DEFAULT_MAX_CHARS;
-        int overlap = DEFAULT_OVERLAP;
+        int maxChars = configuredMaxChars > 0 ? configuredMaxChars : DEFAULT_MAX_CHARS;
+        int overlap = configuredOverlap >= 0 ? configuredOverlap : DEFAULT_OVERLAP;
+        overlap = Math.min(overlap, Math.max(0, maxChars / 2));
 
         List<Chunk> chunks = new ArrayList<>();
 

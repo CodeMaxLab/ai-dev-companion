@@ -25,6 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ChunkEmbeddingService {
 
+    private static final int MAX_EMBEDDING_INPUT_CHARS = 1000;
+
     private final ChunkRepository chunkRepository;
     private final OllamaEmbeddingClient embeddingClient;
 
@@ -45,7 +47,11 @@ public class ChunkEmbeddingService {
             }
 
             try {
-                float[] vector = embeddingClient.embed(chunk.getText());
+                String embeddingInput = sanitizeEmbeddingInput(chunk);
+                if (embeddingInput.isBlank()) {
+                    continue;
+                }
+                float[] vector = embeddingClient.embed(embeddingInput);
                 String vectorLiteral = toPgVectorLiteral(vector);
                 int updatedRows = chunkRepository.updateEmbedding(chunk.getId(), vectorLiteral);
                 if (updatedRows > 0) {
@@ -57,6 +63,16 @@ public class ChunkEmbeddingService {
         }
 
         return generated;
+    }
+
+    private String sanitizeEmbeddingInput(Chunk chunk) {
+        String text = chunk.getText().trim();
+        if (text.length() <= MAX_EMBEDDING_INPUT_CHARS) {
+            return text;
+        }
+
+        log.debug("Truncating chunk {} embedding input from {} to {} chars", chunk.getId(), text.length(), MAX_EMBEDDING_INPUT_CHARS);
+        return text.substring(0, MAX_EMBEDDING_INPUT_CHARS);
     }
 
     private String toPgVectorLiteral(float[] vector) {
