@@ -34,8 +34,8 @@ class ChunkIndexingServiceTest {
         CodeFile f2 = new CodeFile("b.txt", "alpha beta gamma", null);
 
         when(codeFileRepository.findByProjectId(projectId)).thenReturn(List.of(f1, f2));
-        when(chunkingService.chunkAndSave(f1)).thenReturn(List.of(new Chunk(null, "a.txt", "t", 0, 1, null, null)));
-        when(chunkingService.chunkAndSave(f2)).thenReturn(List.of(new Chunk(null, "b.txt", "t1", 0, 1, null, null), new Chunk(null, "b.txt", "t2", 1, 2, null, null)));
+        when(chunkingService.chunkAndSave(f1)).thenReturn(List.of(new Chunk(null, "a.txt", "t", 0, 1, null)));
+        when(chunkingService.chunkAndSave(f2)).thenReturn(List.of(new Chunk(null, "b.txt", "t1", 0, 1, null), new Chunk(null, "b.txt", "t2", 1, 2, null)));
 
         int total = service.indexChunksForProject(projectId);
 
