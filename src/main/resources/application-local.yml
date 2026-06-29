@@ -1,2 +1,6 @@
 groq:
   api-key: 
+
+embedding:
+  base-url: http://localhost:11434
+  model: all-minilm

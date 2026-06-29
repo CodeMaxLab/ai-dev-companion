@@ -6,6 +6,7 @@ import java.util.UUID;
 import com.max.ai_dev_companion.dto.CreateProjectRequest;
 import com.max.ai_dev_companion.dto.IndexedFileCountResponse;
 import com.max.ai_dev_companion.dto.ProjectFileResponse;
+import com.max.ai_dev_companion.dto.ProjectIndexResponse;
 import com.max.ai_dev_companion.dto.ProjectResponse;
 import com.max.ai_dev_companion.service.ProjectService;
 import org.junit.jupiter.api.Test;
@@ -82,4 +83,21 @@ class ProjectControllerTest {
                 .expectBody()
                 .jsonPath("$.indexedFiles").isEqualTo(2);
     }
+
+        @Test
+        void indexProject_shouldReturnFilesChunksAndEmbeddingsCounts() {
+                UUID projectId = UUID.randomUUID();
+                when(projectIndexService.indexProject(eq(projectId)))
+                                .thenReturn(new ProjectIndexResponse(projectId, 2, 6, 6));
+
+                webTestClient.post()
+                                .uri("/projects/{projectId}/index", projectId)
+                                .exchange()
+                                .expectStatus().isOk()
+                                .expectBody()
+                                .jsonPath("$.projectId").isEqualTo(projectId.toString())
+                                .jsonPath("$.filesIndexed").isEqualTo(2)
+                                .jsonPath("$.chunksGenerated").isEqualTo(6)
+                                .jsonPath("$.embeddingsGenerated").isEqualTo(6);
+        }
 }

@@ -18,6 +18,10 @@ spring:
 groq:
   api-key: ${GROQ_API_KEY:}
 
+embedding:
+  base-url: ${EMBEDDING_BASE_URL:http://localhost:11434}
+  model: ${EMBEDDING_MODEL:all-minilm}
+
 logging:
   level:
     com.max.ai_dev_companion: DEBUG
