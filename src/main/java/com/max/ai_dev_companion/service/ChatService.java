@@ -14,6 +14,7 @@ import dev.langchain4j.model.chat.response.StreamingChatResponseHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * Service responsible for sending prompts to the LLM.
@@ -66,7 +67,7 @@ public class ChatService {
      * @return a Flux of partial response tokens from the LLM
      */
     public Flux<String> stream(String message) {
-        return Flux.create(sink -> {
+        return Flux.<String>create(sink -> {
             try {
                 streamingModel.chat(message, new StreamingChatResponseHandler() {
                     @Override
@@ -88,7 +89,7 @@ public class ChatService {
             } catch (Exception e) {
                 sink.error(e);
             }
-        });
+        }).subscribeOn(Schedulers.boundedElastic());
     }
 
     /**
