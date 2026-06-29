@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -19,15 +19,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 @Component
 public class OllamaEmbeddingClient {
 
-    private final WebClient webClient;
+    private final RestClient restClient;
     private final String baseUrl;
     private final String model;
 
     public OllamaEmbeddingClient(
-            WebClient.Builder webClientBuilder,
+            RestClient.Builder restClientBuilder,
             @Value("${embedding.base-url:http://localhost:11434}") String baseUrl,
             @Value("${embedding.model:all-minilm}") String model) {
-        this.webClient = webClientBuilder.build();
+        this.restClient = restClientBuilder.build();
         this.baseUrl = baseUrl;
         this.model = model;
     }
@@ -39,14 +39,13 @@ public class OllamaEmbeddingClient {
      * @return embedding vector
      */
     public float[] embed(String text) {
-        JsonNode payload = webClient.post()
+        JsonNode payload = restClient.post()
                 .uri(normalizeUrl(baseUrl) + "/api/embeddings")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .bodyValue(new OllamaEmbeddingRequest(model, text))
+            .body(new OllamaEmbeddingRequest(model, text))
                 .retrieve()
-                .bodyToMono(JsonNode.class)
-                .block();
+            .body(JsonNode.class);
 
         return parseVector(payload);
     }
