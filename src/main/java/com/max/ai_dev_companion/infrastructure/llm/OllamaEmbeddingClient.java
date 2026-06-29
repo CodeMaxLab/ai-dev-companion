@@ -24,10 +24,9 @@ public class OllamaEmbeddingClient {
     private final String model;
 
     public OllamaEmbeddingClient(
-            RestClient.Builder restClientBuilder,
             @Value("${embedding.base-url:http://localhost:11434}") String baseUrl,
             @Value("${embedding.model:all-minilm}") String model) {
-        this.restClient = restClientBuilder.build();
+        this.restClient = RestClient.builder().build();
         this.baseUrl = baseUrl;
         this.model = model;
     }
