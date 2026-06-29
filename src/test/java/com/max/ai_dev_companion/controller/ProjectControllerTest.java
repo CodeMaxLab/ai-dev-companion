@@ -12,21 +12,25 @@ import com.max.ai_dev_companion.service.ProjectService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
-@WebFluxTest(ProjectController.class)
+@WebMvcTest(ProjectController.class)
 class ProjectControllerTest {
 
     @Autowired
-    private WebTestClient webTestClient;
+        private MockMvc mockMvc;
 
     @MockBean
     private ProjectService projectService;
@@ -35,25 +39,22 @@ class ProjectControllerTest {
     private com.max.ai_dev_companion.service.ProjectIndexService projectIndexService;
 
     @Test
-    void createProject_shouldReturnProjectResponse() {
+    void createProject_shouldReturnProjectResponse() throws Exception {
         UUID projectId = UUID.randomUUID();
         when(projectService.createProject(eq("Demo"), eq("/tmp/demo")))
                 .thenReturn(new ProjectResponse(projectId, "Demo", "/tmp/demo"));
 
-        webTestClient.post()
-                .uri("/projects")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new CreateProjectRequest("Demo", "/tmp/demo"))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.id").isEqualTo(projectId.toString())
-                .jsonPath("$.name").isEqualTo("Demo")
-                .jsonPath("$.rootPath").isEqualTo("/tmp/demo");
+        mockMvc.perform(post("/projects")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Demo\",\"rootPath\":\"/tmp/demo\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(projectId.toString()))
+                .andExpect(jsonPath("$.name").value("Demo"))
+                .andExpect(jsonPath("$.rootPath").value("/tmp/demo"));
     }
 
     @Test
-    void getProjectFiles_shouldReturnInterestingFiles() {
+    void getProjectFiles_shouldReturnInterestingFiles() throws Exception {
         UUID projectId = UUID.randomUUID();
         when(projectService.listProjectFiles(eq(projectId)))
                 .thenReturn(List.of(
@@ -61,43 +62,34 @@ class ProjectControllerTest {
                         new ProjectFileResponse("src/Main.java", "Main.java", 50)
                 ));
 
-        webTestClient.get()
-                .uri("/projects/{projectId}/files", projectId)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$[0].relativePath").isEqualTo("README.md")
-                .jsonPath("$[1].relativePath").isEqualTo("src/Main.java");
+        mockMvc.perform(get("/projects/{projectId}/files", projectId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].relativePath").value("README.md"))
+                .andExpect(jsonPath("$[1].relativePath").value("src/Main.java"));
     }
 
     @Test
-    void indexProjectFiles_shouldReturnIndexedFileCount() {
+    void indexProjectFiles_shouldReturnIndexedFileCount() throws Exception {
         UUID projectId = UUID.randomUUID();
         when(projectService.indexProjectFiles(eq(projectId)))
                 .thenReturn(new IndexedFileCountResponse(2));
 
-        webTestClient.post()
-                .uri("/projects/{projectId}/files", projectId)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.indexedFiles").isEqualTo(2);
+        mockMvc.perform(post("/projects/{projectId}/files", projectId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.indexedFiles").value(2));
     }
 
         @Test
-        void indexProject_shouldReturnFilesChunksAndEmbeddingsCounts() {
+        void indexProject_shouldReturnFilesChunksAndEmbeddingsCounts() throws Exception {
                 UUID projectId = UUID.randomUUID();
                 when(projectIndexService.indexProject(eq(projectId)))
                                 .thenReturn(new ProjectIndexResponse(projectId, 2, 6, 6));
 
-                webTestClient.post()
-                                .uri("/projects/{projectId}/index", projectId)
-                                .exchange()
-                                .expectStatus().isOk()
-                                .expectBody()
-                                .jsonPath("$.projectId").isEqualTo(projectId.toString())
-                                .jsonPath("$.filesIndexed").isEqualTo(2)
-                                .jsonPath("$.chunksGenerated").isEqualTo(6)
-                                .jsonPath("$.embeddingsGenerated").isEqualTo(6);
+                mockMvc.perform(post("/projects/{projectId}/index", projectId))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.projectId").value(projectId.toString()))
+                                .andExpect(jsonPath("$.filesIndexed").value(2))
+                                .andExpect(jsonPath("$.chunksGenerated").value(6))
+                                .andExpect(jsonPath("$.embeddingsGenerated").value(6));
         }
 }

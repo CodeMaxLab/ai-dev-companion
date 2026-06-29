@@ -1,6 +1,8 @@
 package com.max.ai_dev_companion.service;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -13,8 +15,6 @@ import dev.langchain4j.model.chat.response.ChatResponse;
 import dev.langchain4j.model.chat.response.StreamingChatResponseHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Flux;
-import reactor.core.scheduler.Schedulers;
 
 /**
  * Service responsible for sending prompts to the LLM.
@@ -64,32 +64,36 @@ public class ChatService {
      * Send a single user message to the streaming LLM endpoint.
      *
      * @param message the user prompt to stream to the model
-     * @return a Flux of partial response tokens from the LLM
+     * @param onToken callback invoked for each partial token
+     * @param onComplete callback invoked when streaming is complete
+     * @param onError callback invoked when streaming fails
      */
-    public Flux<String> stream(String message) {
-        return Flux.<String>create(sink -> {
+    public void stream(String message,
+                       Consumer<String> onToken,
+                       Runnable onComplete,
+                       Consumer<Throwable> onError) {
+        CompletableFuture.runAsync(() -> {
             try {
                 streamingModel.chat(message, new StreamingChatResponseHandler() {
                     @Override
                     public void onPartialResponse(String partialResponse) {
-                        // Emit raw token; controller will wrap into SSE and set charset
-                        sink.next(partialResponse);
+                        onToken.accept(partialResponse);
                     }
 
                     @Override
                     public void onCompleteResponse(ChatResponse completeResponse) {
-                        sink.complete();
+                        onComplete.run();
                     }
 
                     @Override
                     public void onError(Throwable error) {
-                        sink.error(error);
+                        onError.accept(error);
                     }
                 });
             } catch (Exception e) {
-                sink.error(e);
+                onError.accept(e);
             }
-        }).subscribeOn(Schedulers.boundedElastic());
+        });
     }
 
     /**

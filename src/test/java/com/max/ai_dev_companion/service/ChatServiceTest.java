@@ -9,7 +9,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -19,7 +22,6 @@ import com.max.ai_dev_companion.model.MessageRole;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.model.chat.response.StreamingChatResponseHandler;
-import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 class ChatServiceTest {
@@ -64,8 +66,16 @@ class ChatServiceTest {
             return null;
         }).when(streamingModel).chat(anyString(), any(StreamingChatResponseHandler.class));
 
-        StepVerifier.create(chatService.stream("Bonjour"))
-                .expectNext("token1", "token2")
-                .verifyComplete();
+        @SuppressWarnings("unchecked")
+        java.util.function.Consumer<String> onToken = Mockito.mock(java.util.function.Consumer.class);
+        Runnable onComplete = Mockito.mock(Runnable.class);
+        @SuppressWarnings("unchecked")
+        java.util.function.Consumer<Throwable> onError = Mockito.mock(java.util.function.Consumer.class);
+
+        chatService.stream("Bonjour", onToken, onComplete, onError);
+
+        verify(onToken, timeout(500)).accept("token1");
+        verify(onToken, timeout(500)).accept("token2");
+        verify(onComplete, timeout(500)).run();
     }
 }
