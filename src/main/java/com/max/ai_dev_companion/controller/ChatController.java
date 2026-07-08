@@ -37,7 +37,7 @@ public class ChatController {
             @RequestBody ChatRequest request
     ) {
         return new ChatResponse(
-                chatService.chat(request.message())
+                chatService.chat(request.message(), request.projectId())
         );
     }
 
@@ -56,7 +56,7 @@ public class ChatController {
     ) {
                 SseEmitter emitter = new SseEmitter(0L);
                 chatService.stream(
-                                request.message(),
+                                chatService.buildPromptWithRetrieval(request.message(), request.projectId()),
                                 token -> {
                                         try {
                                                 emitter.send(SseEmitter.event().data(token));

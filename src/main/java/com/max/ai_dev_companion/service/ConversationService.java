@@ -57,11 +57,12 @@ public class ConversationService {
      *
      * @param conversationId the identifier of the targeted conversation
      * @param content        the content of the user message
+     * @param projectId      optional project id used for RAG retrieval
      * @return the DTO of the generated AI message
      * @throws ResponseStatusException if the conversation does not exist
      */
     @Transactional
-    public MessageResponse sendMessage(UUID conversationId, String content) {
+    public MessageResponse sendMessage(UUID conversationId, String content, UUID projectId) {
         Conversation conversation = conversationRepository.findById(conversationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conversation non trouvée"));
 
@@ -72,7 +73,12 @@ public class ConversationService {
         // Build history (including the just-saved user message) and send to LLM
         List<Message> history = conversation.getMessages();
         log.debug("Conversation {} - messages count before LLM call: {}", conversationId, history.size());
-        String aiResponse = chatService.chatWithHistory(history);
+        String aiResponse;
+        if (projectId == null) {
+            aiResponse = chatService.chatWithHistory(history);
+        } else {
+            aiResponse = chatService.chat(content, projectId);
+        }
         log.debug("Conversation {} - received AI response length={}", conversationId, aiResponse == null ? 0 : aiResponse.length());
 
         Message aiMessage = new Message(MessageRole.AI, aiResponse);

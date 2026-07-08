@@ -30,4 +30,17 @@ public interface ChunkRepository extends JpaRepository<Chunk, UUID> {
 
     @Query(value = "SELECT * FROM chunks WHERE embedding IS NOT NULL ORDER BY embedding <-> CAST(:vector AS vector) LIMIT :k", nativeQuery = true)
     List<Chunk> findNearestByEmbedding(@Param("vector") String vector, @Param("k") int k);
+
+    @Query(value = """
+            SELECT c.*
+            FROM chunks c
+            JOIN code_files cf ON cf.id = c.source_id
+            WHERE cf.project_id = :projectId
+                AND c.embedding IS NOT NULL
+            ORDER BY c.embedding <-> CAST(:vector AS vector)
+            LIMIT :k
+            """, nativeQuery = true)
+    List<Chunk> findNearestByEmbeddingAndProjectId(@Param("projectId") UUID projectId,
+                                                   @Param("vector") String vector,
+                                                   @Param("k") int k);
 }
