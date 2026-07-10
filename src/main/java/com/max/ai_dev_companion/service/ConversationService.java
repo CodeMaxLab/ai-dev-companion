@@ -62,6 +62,11 @@ public class ConversationService {
      * @throws ResponseStatusException if the conversation does not exist
      */
     @Transactional
+    public MessageResponse sendMessage(UUID conversationId, String content) {
+        return sendMessage(conversationId, content, null);
+    }
+
+    @Transactional
     public MessageResponse sendMessage(UUID conversationId, String content, UUID projectId) {
         Conversation conversation = conversationRepository.findById(conversationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conversation non trouvée"));

@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ChunkEmbeddingService {
 
-    private static final int MAX_EMBEDDING_INPUT_CHARS = 1000;
+    private static final int MAX_EMBEDDING_INPUT_CHARS = 500;
 
     private final ChunkRepository chunkRepository;
     private final OllamaEmbeddingClient embeddingClient;
