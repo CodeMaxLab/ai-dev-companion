@@ -1,9 +1,12 @@
 package com.max.ai_dev_companion.controller;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -67,7 +70,13 @@ public class ConversationController {
     @PostMapping(value = "/{conversationId}/messages", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public MessageResponse sendMessage(@PathVariable UUID conversationId,
                                        @RequestBody @Valid MessageRequest request) {
-        // ICI
         return conversationService.sendMessage(conversationId, request.content(), request.projectId());
+    }
+
+    @DeleteMapping(value = "/{conversationId}")
+    public ResponseEntity<Map<String, String>> deleteConversation(@PathVariable UUID conversationId) {
+        conversationService.deleteConversation(conversationId);
+        String msg = String.format("Conversation %s supprimé", conversationId);
+        return ResponseEntity.ok(Map.of("message", msg));
     }
 }

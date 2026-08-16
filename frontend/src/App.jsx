@@ -78,6 +78,25 @@ export default function App() {
     }
   };
 
+  const deleteConversation = async (conversationId, e) => {
+    e.stopPropagation();
+    if (!window.confirm('Supprimer cette conversation ?')) return;
+    try {
+      setIsLoading(true);
+      await apiFetch(`/conversations/${conversationId}`, { method: 'DELETE' });
+      setConversations((prev) => prev.filter((c) => c.id !== conversationId));
+      setFiltered((prev) => prev.filter((c) => c.id !== conversationId));
+      if (selectedConversation?.id === conversationId) {
+        setSelectedConversation(null);
+      }
+      setError('');
+    } catch (err) {
+      setError('Unable to delete conversation.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const sendMessage = async () => {
     if (!selectedConversation || !prompt.trim()) return;
     setSelectedConversation((current) => ({
@@ -137,10 +156,13 @@ export default function App() {
         <div className="conversation-list">
           {filtered.length === 0 && <p className="empty-state">No conversations yet.</p>}
           {filtered.map((conversation) => (
-            <button
+            <div
               key={conversation.id}
+              role="button"
+              tabIndex={0}
               className={`conversation-item ${selectedConversation?.id === conversation.id ? 'active' : ''}`}
               onClick={() => loadConversation(conversation.id)}
+              onKeyDown={(e) => { if (e.key === 'Enter') loadConversation(conversation.id); }}
             >
               <div className="conv-left">
                 <div className="conv-avatar">{(conversation.title && conversation.title[0]) || 'C'}</div>
@@ -149,7 +171,10 @@ export default function App() {
                   <div className="conversation-snippet">{conversation.createdAt ? new Date(conversation.createdAt).toLocaleString() : ''}</div>
                 </div>
               </div>
-            </button>
+              <div className="conv-right">
+                <button className="delete-button" onClick={(e) => deleteConversation(conversation.id, e)} title="Supprimer">🗑️</button>
+              </div>
+            </div>
           ))}
         </div>
       </aside>

@@ -80,7 +80,6 @@ public class ConversationService {
         log.debug("Conversation {} - messages count before LLM call: {}", conversationId, history.size());
         String aiResponse;
         if (projectId == null) {
-            // Ici
             aiResponse = chatService.chatWithHistory(history);
         } else {
             aiResponse = chatService.chat(content, projectId);
@@ -132,6 +131,21 @@ public class ConversationService {
         return conversationRepository.findAll().stream()
                 .map(this::toSummaryResponse)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Deletes a conversation and its messages.
+     *
+     * @param conversationId the identifier of the conversation to delete
+     * @throws ResponseStatusException if the conversation does not exist
+     */
+    @Transactional
+    public void deleteConversation(UUID conversationId) {
+        log.debug("Deleting conversation {}", conversationId);
+        if (!conversationRepository.existsById(conversationId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Conversation non trouvée");
+        }
+        conversationRepository.deleteById(conversationId);
     }
 
     private ConversationResponse toConversationResponse(Conversation conversation) {
