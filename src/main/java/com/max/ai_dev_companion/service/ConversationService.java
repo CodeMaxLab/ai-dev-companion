@@ -80,6 +80,7 @@ public class ConversationService {
         log.debug("Conversation {} - messages count before LLM call: {}", conversationId, history.size());
         String aiResponse;
         if (projectId == null) {
+            // Ici
             aiResponse = chatService.chatWithHistory(history);
         } else {
             aiResponse = chatService.chat(content, projectId);

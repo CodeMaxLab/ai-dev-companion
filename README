@@ -1,1 +1,22 @@
 Just another lab.
+
+--- RUN ---
+Open PowerShell and navigate to the root directory of `ai-dev-companion`.
+
+BACKEND
+Run `docker compose up`
+Run `./mvnw spring-boot:run`
+
+AI
+Open PowerShell.
+Run `ollama pull all-minilm`
+
+FRONTEND
+Open PowerShell.
+Navigate to the `frontend` directory.
+Run `npm run dev`
+
+--- TEST ---
+AI
+To test that Ollama is running:
+Run `Invoke-RestMethod -Uri http://localhost:11434/api/tags`. The response should be a JSON object.

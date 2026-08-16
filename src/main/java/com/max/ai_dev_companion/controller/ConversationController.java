@@ -67,6 +67,7 @@ public class ConversationController {
     @PostMapping(value = "/{conversationId}/messages", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public MessageResponse sendMessage(@PathVariable UUID conversationId,
                                        @RequestBody @Valid MessageRequest request) {
+        // ICI
         return conversationService.sendMessage(conversationId, request.content(), request.projectId());
     }
 }

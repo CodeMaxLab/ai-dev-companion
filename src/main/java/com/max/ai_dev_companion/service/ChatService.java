@@ -3,8 +3,6 @@ package com.max.ai_dev_companion.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -17,8 +15,6 @@ import com.max.ai_dev_companion.repository.ChunkRepository;
 
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
-import dev.langchain4j.model.chat.response.ChatResponse;
-import dev.langchain4j.model.chat.response.StreamingChatResponseHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -111,42 +107,6 @@ public class ChatService {
         String response = model.chat(prompt);
         log.debug("LLM response: {}", response);
         return response;
-    }
-
-    /**
-     * Send a single user message to the streaming LLM endpoint.
-     *
-     * @param message the user prompt to stream to the model
-     * @param onToken callback invoked for each partial token
-     * @param onComplete callback invoked when streaming is complete
-     * @param onError callback invoked when streaming fails
-     */
-    public void stream(String message,
-                       Consumer<String> onToken,
-                       Runnable onComplete,
-                       Consumer<Throwable> onError) {
-        CompletableFuture.runAsync(() -> {
-            try {
-                streamingModel.chat(message, new StreamingChatResponseHandler() {
-                    @Override
-                    public void onPartialResponse(String partialResponse) {
-                        onToken.accept(partialResponse);
-                    }
-
-                    @Override
-                    public void onCompleteResponse(ChatResponse completeResponse) {
-                        onComplete.run();
-                    }
-
-                    @Override
-                    public void onError(Throwable error) {
-                        onError.accept(error);
-                    }
-                });
-            } catch (Exception e) {
-                onError.accept(e);
-            }
-        });
     }
 
     /**
