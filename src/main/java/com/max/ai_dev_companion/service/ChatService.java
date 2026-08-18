@@ -14,7 +14,6 @@ import com.max.ai_dev_companion.model.Message;
 import com.max.ai_dev_companion.repository.ChunkRepository;
 
 import dev.langchain4j.model.chat.ChatModel;
-import dev.langchain4j.model.chat.StreamingChatModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,7 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ChatService {
 
     private final ChatModel model;
-    private final StreamingChatModel streamingModel;
     private final OllamaEmbeddingClient embeddingClient;
     private final ChunkRepository chunkRepository;
 
