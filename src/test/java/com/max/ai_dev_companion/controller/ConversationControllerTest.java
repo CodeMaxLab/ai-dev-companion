@@ -6,8 +6,6 @@ import java.util.UUID;
 
 import com.max.ai_dev_companion.dto.ConversationResponse;
 import com.max.ai_dev_companion.dto.ConversationSummaryResponse;
-import com.max.ai_dev_companion.dto.CreateConversationRequest;
-import com.max.ai_dev_companion.dto.MessageRequest;
 import com.max.ai_dev_companion.dto.MessageResponse;
 import com.max.ai_dev_companion.service.ConversationService;
 import org.junit.jupiter.api.Test;
@@ -20,6 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -65,7 +64,7 @@ class ConversationControllerTest {
     @Test
     void sendMessage_shouldReturnMessageResponse() throws Exception {
         UUID conversationId = UUID.randomUUID();
-        when(conversationService.sendMessage(eq(conversationId), eq("Hello")))
+        when(conversationService.sendMessage(eq(conversationId), eq("Hello"), isNull(UUID.class)))
                 .thenReturn(new MessageResponse(UUID.randomUUID(), "USER", "Hello", Instant.now()));
 
         mockMvc.perform(post("/conversations/{conversationId}/messages", conversationId)
