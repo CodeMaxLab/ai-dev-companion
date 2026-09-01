@@ -18,6 +18,9 @@ public class LlmConfig {
     @Value("${groq.api-key:}")
     private String apiKey;
 
+    @Value("${groq.model:openai/gpt-oss-20b}")
+    private String modelName;
+
     @PostConstruct
     public void init() {
         this.apiKey = normalizeApiKey(this.apiKey);
@@ -30,7 +33,7 @@ public class LlmConfig {
         return OpenAiChatModel.builder()
                 .baseUrl("https://api.groq.com/openai/v1")
                 .apiKey(apiKey)
-                .modelName("llama-3.3-70b-versatile")
+                .modelName(modelName)
                 .build();
     }
 
@@ -40,7 +43,7 @@ public class LlmConfig {
         return OpenAiStreamingChatModel.builder()
                 .baseUrl("https://api.groq.com/openai/v1")
                 .apiKey(apiKey)
-                .modelName("llama-3.3-70b-versatile")
+                .modelName(modelName)
                 .build();
     }
 

@@ -20,6 +20,8 @@ class GroqPropertiesResolutionTest {
         contextRunner.run(context -> {
             assertThat(context).hasNotFailed();
             assertThat(context.getBean(ChatModel.class)).isNotNull();
+            assertThat(ReflectionTestUtils.getField(context.getBean(LlmConfig.class), "modelName"))
+                    .isEqualTo("openai/gpt-oss-20b");
         });
     }
 
