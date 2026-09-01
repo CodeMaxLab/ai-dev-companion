@@ -20,3 +20,52 @@ Run `npm run dev`
 AI
 To test that Ollama is running:
 Run `Invoke-RestMethod -Uri http://localhost:11434/api/tags`. The response should be a JSON object.
+
+
+--- TODO ---
+
+1. **Playwright end-to-end tests**
+	- Create a conversation.
+	- Select a conversation and display its history.
+	- Send a message and display the AI response.
+	- Display API errors and `PENDING`/`FAILED` message statuses.
+	- Delete a conversation.
+
+2. **Replace Groq with a local LLM**
+	- Add Ollama chat integration.
+	- Choose and download a local chat model.
+	- Replace the Groq beans in `LlmConfig`.
+	- Remove the `GROQ_API_KEY` configuration.
+	- Verify streaming support if needed.
+	- Test the integration through the existing `ChatGateway`.
+
+3. **Asynchronous project indexing**
+	- Run indexing in the background.
+	- Return a `jobId` with `202 Accepted`.
+	- Expose the indexing job status.
+	- Support `QUEUED`, `SCANNING`, `CHUNKING`, `EMBEDDING`, `COMPLETED`, and `FAILED` states.
+
+4. **Centralized error handling**
+	- Replace scattered `ResponseStatusException` usage.
+	- Add a `@RestControllerAdvice`.
+	- Return standardized `ProblemDetail` responses.
+
+5. **Project path security**
+	- Restrict accessible directories.
+	- Exclude `.env`, `.git`, private keys, and sensitive files.
+	- Add file size and directory depth limits.
+	- Handle symbolic links safely.
+
+6. **Database migrations**
+	- Replace `ddl-auto: update` with Flyway or Liquibase.
+	- Version the `messages.status` column and future schema changes.
+
+7. **Additional backend tests**
+	- Test message status transitions.
+	- Test embedding failures.
+	- Test file reading failures.
+	- Add PostgreSQL/pgvector integration tests where useful.
+
+8. **Optional package reorganization**
+	- Group components by feature.
+	- Clarify the boundaries between application, domain, and infrastructure layers.

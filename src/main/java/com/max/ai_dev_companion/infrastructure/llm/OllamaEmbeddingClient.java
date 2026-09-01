@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.max.ai_dev_companion.application.port.EmbeddingGateway;
 
 /**
  * Small client around local Ollama embedding endpoint.
@@ -17,7 +18,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * and expects a JSON payload containing an {@code embedding} array.</p>
  */
 @Component
-public class OllamaEmbeddingClient {
+public class OllamaEmbeddingClient implements EmbeddingGateway {
 
     private final RestClient restClient;
     private final String baseUrl;
@@ -37,6 +38,7 @@ public class OllamaEmbeddingClient {
      * @param text input text to vectorize
      * @return embedding vector
      */
+    @Override
     public float[] embed(String text) {
         JsonNode payload = restClient.post()
                 .uri(normalizeUrl(baseUrl) + "/api/embeddings")

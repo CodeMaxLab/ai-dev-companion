@@ -33,6 +33,10 @@ public class Message {
     @Column(nullable = false, length = 5000)
     private String content;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 10)
+    private MessageStatus status = MessageStatus.COMPLETED;
+
     @Column(nullable = false)
     private Instant createdAt = Instant.now();
 
@@ -42,6 +46,12 @@ public class Message {
     public Message(MessageRole role, String content) {
         this.role = role;
         this.content = content;
+    }
+
+    public Message(MessageRole role, String content, MessageStatus status) {
+        this.role = role;
+        this.content = content;
+        this.status = status;
     }
 
     public UUID getId() {
@@ -60,11 +70,25 @@ public class Message {
         return content;
     }
 
+    public MessageStatus getStatus() {
+        return status;
+    }
+
     public Instant getCreatedAt() {
         return createdAt;
     }
 
     public void setConversation(Conversation conversation) {
         this.conversation = conversation;
+    }
+
+    public void markCompleted(String content) {
+        this.content = content;
+        this.status = MessageStatus.COMPLETED;
+    }
+
+    public void markFailed(String content) {
+        this.content = content;
+        this.status = MessageStatus.FAILED;
     }
 }

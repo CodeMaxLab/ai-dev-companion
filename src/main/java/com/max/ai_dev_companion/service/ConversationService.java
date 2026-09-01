@@ -9,14 +9,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.max.ai_dev_companion.application.port.ChatGateway;
 import com.max.ai_dev_companion.dto.ConversationResponse;
 import com.max.ai_dev_companion.dto.ConversationSummaryResponse;
 import com.max.ai_dev_companion.dto.MessageResponse;
 import com.max.ai_dev_companion.model.Conversation;
 import com.max.ai_dev_companion.model.Message;
-import com.max.ai_dev_companion.model.MessageRole;
 import com.max.ai_dev_companion.repository.ConversationRepository;
-import com.max.ai_dev_companion.repository.MessageRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,8 +33,8 @@ import lombok.extern.slf4j.Slf4j;
 public class ConversationService {
 
     private final ConversationRepository conversationRepository;
-    private final MessageRepository messageRepository;
-    private final ChatService chatService;
+    private final ChatGateway chatGateway;
+    private final ConversationMessagePersistenceService messagePersistenceService;
 
     /**
      * Creates a new conversation with a safe title.
@@ -61,36 +60,29 @@ public class ConversationService {
      * @return the DTO of the generated AI message
      * @throws ResponseStatusException if the conversation does not exist
      */
-    @Transactional
     public MessageResponse sendMessage(UUID conversationId, String content) {
         return sendMessage(conversationId, content, null);
     }
 
-    @Transactional
     public MessageResponse sendMessage(UUID conversationId, String content, UUID projectId) {
-        Conversation conversation = conversationRepository.findById(conversationId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conversation non trouvée"));
-
-        Message userMessage = new Message(MessageRole.USER, content);
-        conversation.addMessage(userMessage);
-        messageRepository.save(userMessage);
-
-        // Build history (including the just-saved user message) and send to LLM
-        List<Message> history = conversation.getMessages();
-        log.debug("Conversation {} - messages count before LLM call: {}", conversationId, history.size());
-        String aiResponse;
-        if (projectId == null) {
-            aiResponse = chatService.chatWithHistory(history);
-        } else {
-            aiResponse = chatService.chat(content, projectId);
+        ConversationMessagePersistenceService.PreparedConversationMessage preparedMessage =
+                messagePersistenceService.saveUserMessage(conversationId, content);
+        MessageResponse pendingResponse = messagePersistenceService.createPendingAiMessage(conversationId);
+        try {
+            List<Message> history = preparedMessage.history();
+            log.debug("Conversation {} - messages count before LLM call: {}", conversationId, history.size());
+            String aiResponse;
+            if (projectId == null) {
+                aiResponse = chatGateway.chatWithHistory(history);
+            } else {
+                aiResponse = chatGateway.chat(content, projectId);
+            }
+            log.debug("Conversation {} - received AI response length={}", conversationId, aiResponse == null ? 0 : aiResponse.length());
+            return messagePersistenceService.completeAiMessage(pendingResponse.id(), aiResponse);
+        } catch (RuntimeException exception) {
+            messagePersistenceService.failAiMessage(pendingResponse.id(), "Unable to generate an AI response");
+            throw exception;
         }
-        log.debug("Conversation {} - received AI response length={}", conversationId, aiResponse == null ? 0 : aiResponse.length());
-
-        Message aiMessage = new Message(MessageRole.AI, aiResponse);
-        conversation.addMessage(aiMessage);
-        messageRepository.save(aiMessage);
-
-        return toMessageResponse(aiMessage);
     }
 
     /**
@@ -174,7 +166,8 @@ public class ConversationService {
                 message.getId(),
                 message.getRole().name(),
                 message.getContent(),
-                message.getCreatedAt()
+                message.getCreatedAt(),
+                message.getStatus()
         );
     }
 }

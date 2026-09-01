@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.max.ai_dev_companion.application.port.ChatGateway;
 import com.max.ai_dev_companion.dto.ConversationResponse;
 import com.max.ai_dev_companion.dto.ConversationSummaryResponse;
 import com.max.ai_dev_companion.dto.MessageResponse;
@@ -36,7 +37,10 @@ class ConversationServiceTest {
     private MessageRepository messageRepository;
 
     @Mock
-    private ChatService chatService;
+    private ChatGateway chatGateway;
+
+    @Mock
+    private ConversationMessagePersistenceService messagePersistenceService;
 
     @InjectMocks
     private ConversationService conversationService;
@@ -64,21 +68,45 @@ class ConversationServiceTest {
     @Test
     void sendMessage_shouldSaveUserAndAiMessagesAndReturnAiResponse() {
         UUID conversationId = UUID.randomUUID();
-        Conversation conversation = new Conversation("Discussion");
-        when(conversationRepository.findById(conversationId)).thenReturn(Optional.of(conversation));
-        when(messageRepository.save(any(Message.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(chatService.chatWithHistory(any())).thenReturn("AI Response");
+        UUID pendingMessageId = UUID.randomUUID();
+        Message userMessage = new Message(MessageRole.USER, "Hello");
+        Message aiMessage = new Message(MessageRole.AI, "AI Response");
+        when(messagePersistenceService.saveUserMessage(conversationId, "Hello"))
+            .thenReturn(new ConversationMessagePersistenceService.PreparedConversationMessage(
+                "Hello", List.of(userMessage)));
+        when(messagePersistenceService.createPendingAiMessage(conversationId))
+            .thenReturn(new MessageResponse(pendingMessageId, "AI", "", aiMessage.getCreatedAt(),
+                    com.max.ai_dev_companion.model.MessageStatus.PENDING));
+        when(messagePersistenceService.completeAiMessage(pendingMessageId, "AI Response"))
+            .thenReturn(new MessageResponse(pendingMessageId, "AI", "AI Response", aiMessage.getCreatedAt()));
+        when(chatGateway.chatWithHistory(any())).thenReturn("AI Response");
 
         MessageResponse response = conversationService.sendMessage(conversationId, "Hello");
 
         assertThat(response.role()).isEqualTo("AI");
         assertThat(response.content()).isEqualTo("AI Response");
-        assertThat(conversation.getMessages()).hasSize(2);
-        assertThat(conversation.getMessages().get(0).getRole()).isEqualTo(MessageRole.USER);
-        assertThat(conversation.getMessages().get(1).getRole()).isEqualTo(MessageRole.AI);
+        verify(messagePersistenceService).saveUserMessage(conversationId, "Hello");
+        verify(messagePersistenceService).createPendingAiMessage(conversationId);
+        verify(messagePersistenceService).completeAiMessage(pendingMessageId, "AI Response");
+        }
 
-        verify(messageRepository).save(conversation.getMessages().get(0));
-        verify(messageRepository).save(conversation.getMessages().get(1));
+        @Test
+        void sendMessage_shouldMarkAiMessageAsFailedWhenGatewayFails() {
+        UUID conversationId = UUID.randomUUID();
+        UUID pendingMessageId = UUID.randomUUID();
+        when(messagePersistenceService.saveUserMessage(conversationId, "Hello"))
+            .thenReturn(new ConversationMessagePersistenceService.PreparedConversationMessage(
+                "Hello", List.of(new Message(MessageRole.USER, "Hello"))));
+        when(messagePersistenceService.createPendingAiMessage(conversationId))
+            .thenReturn(new MessageResponse(pendingMessageId, "AI", "", java.time.Instant.now(),
+                com.max.ai_dev_companion.model.MessageStatus.PENDING));
+        when(chatGateway.chatWithHistory(any())).thenThrow(new IllegalStateException("LLM unavailable"));
+
+        assertThatThrownBy(() -> conversationService.sendMessage(conversationId, "Hello"))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("LLM unavailable");
+
+        verify(messagePersistenceService).failAiMessage(pendingMessageId, "Unable to generate an AI response");
     }
 
     @Test

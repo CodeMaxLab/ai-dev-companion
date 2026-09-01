@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.max.ai_dev_companion.infrastructure.llm.OllamaEmbeddingClient;
+import com.max.ai_dev_companion.application.port.EmbeddingGateway;
 import com.max.ai_dev_companion.model.Chunk;
 import com.max.ai_dev_companion.repository.ChunkRepository;
 
@@ -28,7 +28,7 @@ public class ChunkEmbeddingService {
     private static final int MAX_EMBEDDING_INPUT_CHARS = 500;
 
     private final ChunkRepository chunkRepository;
-    private final OllamaEmbeddingClient embeddingClient;
+    private final EmbeddingGateway embeddingGateway;
 
     /**
      * Generates embeddings for all chunks of a project that are still missing one.
@@ -51,7 +51,7 @@ public class ChunkEmbeddingService {
                 if (embeddingInput.isBlank()) {
                     continue;
                 }
-                float[] vector = embeddingClient.embed(embeddingInput);
+                float[] vector = embeddingGateway.embed(embeddingInput);
                 String vectorLiteral = toPgVectorLiteral(vector);
                 int updatedRows = chunkRepository.updateEmbedding(chunk.getId(), vectorLiteral);
                 if (updatedRows > 0) {
